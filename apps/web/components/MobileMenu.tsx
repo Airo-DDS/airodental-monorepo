@@ -73,7 +73,7 @@ const menuItemVariants = {
   }
 }
 
-export default function MobileMenu({ isOpen, onClose, menuItems, isSignedIn = false }: MobileMenuProps) {
+export default function MobileMenu({ isOpen, onClose, menuItems }: MobileMenuProps) {
   const { openSignIn } = useClerk()
   const router = useRouter()
   
