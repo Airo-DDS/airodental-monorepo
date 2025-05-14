@@ -2,9 +2,16 @@ import { NextResponse } from "next/server";
 import { prisma } from "@repo/db";
 import { auth } from "@clerk/nextjs/server";
 
+// Updated type for Next.js 15 API handler
+type RouteContextParams = {
+  params: {
+    id: string;
+  };
+};
+
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: RouteContextParams
 ) {
   try {
     const { userId, orgId, has } = await auth();
@@ -15,13 +22,13 @@ export async function GET(
     }
     
     // Check if the requested org ID matches the current context
-    if (orgId && params.id !== orgId) {
+    if (orgId && context.params.id !== orgId) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     
     // Get the organization from our database
     const organization = await prisma.organization.findUnique({
-      where: { id: params.id },
+      where: { id: context.params.id },
       select: {
         id: true,
         name: true,
