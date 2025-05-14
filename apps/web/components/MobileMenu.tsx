@@ -5,6 +5,7 @@ import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { useClerk } from "@clerk/nextjs"
 import { useRouter } from "next/navigation"
+import { X } from "lucide-react"
 
 interface MobileMenuProps {
   isOpen: boolean
@@ -142,21 +143,7 @@ export default function MobileMenu({ isOpen, onClose, menuItems }: MobileMenuPro
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={2} 
-                      d="M6 18L18 6M6 6l12 12" 
-                    />
-                  </svg>
+                  <X className="h-6 w-6" aria-hidden="true" />
                 </motion.button>
               </motion.div>
               

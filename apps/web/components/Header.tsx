@@ -7,6 +7,7 @@ import Image from "next/image"
 import MobileMenu from "./MobileMenu"
 import { useClerk, useAuth } from "@clerk/nextjs"
 import { useRouter } from "next/navigation"
+import { Menu } from "lucide-react"
 
 // Animation variants
 const headerVariants = {
@@ -167,21 +168,7 @@ export default function Header() {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            className="h-6 w-6" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M4 6h16M4 12h16M4 18h16" 
-            />
-          </svg>
+          <Menu className="h-6 w-6" aria-hidden="true" />
         </motion.button>
 
         {/* Mobile menu */}

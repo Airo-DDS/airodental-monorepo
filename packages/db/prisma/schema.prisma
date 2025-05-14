@@ -1,11 +1,12 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["jsonProtocol"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
   provider     = "postgresql"
   url          = env("DATABASE_URL")
+  directUrl    = env("DIRECT_URL")
   relationMode = "prisma"
 }
 
@@ -22,16 +23,17 @@ model User {
 }
 
 model Organization {
-  id            String        @id
-  name          String
-  slug          String?       @unique
-  imageUrl      String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  members       OrganizationMember[]
-  subscriptionId String?       @unique
-  stripeCustomerId String?    @unique
-  planId        String?
+  id              String        @id
+  name            String
+  slug            String?       @unique
+  imageUrl        String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  members         OrganizationMember[]
+  subscriptionId  String?       @unique
+  stripeCustomerId String?      @unique
+  planId          String?       // Legacy field
+  activePlanId    String?       // New field to store Clerk's plan ID
 }
 
 model OrganizationMember {
