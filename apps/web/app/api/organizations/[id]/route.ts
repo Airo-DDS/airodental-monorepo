@@ -2,33 +2,27 @@ import { NextResponse } from "next/server";
 import { prisma } from "@repo/db";
 import { auth } from "@clerk/nextjs/server";
 
-// Updated type for Next.js 15 API handler
-type RouteContextParams = {
-  params: {
-    id: string;
-  };
-};
-
 export async function GET(
   request: Request,
-  context: RouteContextParams
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
+  const { userId, orgId, has } = await auth();
+  
+  // If not authenticated, return 401
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  
+  // Check if the requested org ID matches the current context
+  if (orgId && id !== orgId) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  
   try {
-    const { userId, orgId, has } = await auth();
-    
-    // If not authenticated, return 401
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    
-    // Check if the requested org ID matches the current context
-    if (orgId && context.params.id !== orgId) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-    
     // Get the organization from our database
     const organization = await prisma.organization.findUnique({
-      where: { id: context.params.id },
+      where: { id },
       select: {
         id: true,
         name: true,
