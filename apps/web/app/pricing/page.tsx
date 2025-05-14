@@ -10,7 +10,7 @@ export default function PricingPage() {
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">Simple, Transparent Pricing</h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Choose the plan that's right for your dental practice. All plans include access to our core features.
+          Choose the plan that&apos;s right for your dental practice. All plans include access to our core features.
         </p>
       </div>
       

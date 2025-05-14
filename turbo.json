@@ -4,6 +4,7 @@
   "globalEnv": [
     "NODE_ENV", 
     "DATABASE_URL",
+    "DIRECT_URL",
     "NEXT_PUBLIC_CLERK_IS_SATELLITE",
     "CLERK_DOMAIN",
     "NEXT_PUBLIC_CLERK_DOMAIN",
