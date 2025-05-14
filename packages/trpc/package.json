@@ -1,0 +1,30 @@
+{
+  "name": "@repo/trpc",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./server/index.ts",
+  "types": "./server/index.ts",
+  "exports": {
+    "./server": "./server/index.ts",
+    "./client": "./client/index.ts",
+    "./root": "./server/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "eslint": "^9.26.0",
+    "typescript": "5.8.2"
+  },
+  "dependencies": {
+    "@trpc/client": "^11.1.2",
+    "@trpc/react-query": "^11.1.2",
+    "@trpc/server": "^11.1.2",
+    "superjson": "^2.2.2",
+    "zod": "^3.24.4"
+  }
+}

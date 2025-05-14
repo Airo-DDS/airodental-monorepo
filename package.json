@@ -2,15 +2,16 @@
   "name": "airodental-monorepo",
   "private": true,
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,md,json}\"",
+    "typecheck": "turbo typecheck"
   },
   "devDependencies": {
-    "prettier": "^3.5.3",
-    "turbo": "^2.5.3",
+    "eslint": "^9.26.0",
+    "prettier": "latest",
+    "turbo": "latest",
     "typescript": "5.8.2"
   },
   "packageManager": "pnpm@9.0.0",

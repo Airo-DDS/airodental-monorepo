@@ -1,0 +1,6 @@
+# robots.txt file for Airodental
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://airodental.com/sitemap.xml 

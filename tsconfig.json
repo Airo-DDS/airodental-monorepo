@@ -1,0 +1,25 @@
+// tsconfig.json (root)
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@repo/ui/*": ["packages/ui/src/*"],
+      "@repo/db": ["packages/db/client.ts"],
+      "@repo/trpc/server": ["packages/trpc/server/index.ts"],
+      "@repo/trpc/client": ["packages/trpc/client/index.ts"],
+      "@repo/shared-logic/*": ["packages/shared-logic/src/*"]
+    }
+  },
+  "files": [],
+  "include": [],
+  "references": [
+    { "path": "apps/web" },
+    { "path": "apps/docs" },
+    { "path": "packages/ui" },
+    { "path": "packages/db" },
+    { "path": "packages/trpc" },
+    { "path": "packages/shared-logic" },
+    { "path": "packages/eslint-config" },
+    { "path": "packages/typescript-config" }
+  ]
+}
