@@ -77,7 +77,7 @@ export default function Hero() {
   className="text-[36px] font-medium mb-[30px] text-black md:pr-10 sm:text-[30px] xs:text-[24px]"
   style={{ fontFamily: "Lato, sans-serif" }}
 >
-  Revolutionizing dental practices with AI
+  Revolutionizing dental practices with AI ✨
 </motion.div>
           
           {/* CTA Container */}
