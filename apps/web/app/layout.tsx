@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import { Lato } from 'next/font/google';
 import './globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
-import Header from '@/components/Header';
 
 // Updated to use next/font/google for Geist fonts
 const geistSans = Geist({
@@ -78,18 +77,30 @@ export const metadata: Metadata = {
   },
 };
 
+// Create a client component for the layout content
+function RootLayoutContent({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <body className={`${geistSans.variable} ${geistMono.variable} ${lato.variable} antialiased`}>
+      {children}
+    </body>
+  );
+}
+
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
-        <body className={`${geistSans.variable} ${geistMono.variable} ${lato.variable} antialiased`}>
-          <Header />
-          <main>{children}</main>
-        </body>
+        <RootLayoutContent>
+          {children}
+        </RootLayoutContent>
       </html>
     </ClerkProvider>
   );

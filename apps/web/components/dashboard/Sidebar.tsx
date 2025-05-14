@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { cn } from '@repo/ui';
 import { Button } from '@repo/ui';
 import {
@@ -13,18 +13,85 @@ import {
   ChevronRight,
   X
 } from 'lucide-react';
+import { useOrganization } from '@clerk/nextjs';
+import type { LucideIcon } from 'lucide-react';
+import { UserAccountNav } from './UserAccountNav';
 
-const navigationItems = [
+// Define types for navigation items
+type BaseNavItem = {
+  name: string;
+  href: string;
+  icon: LucideIcon;
+};
+
+type ExternalNavItem = BaseNavItem & {
+  external: true;
+  requiredPlans: string[];
+};
+
+type NavItem = BaseNavItem | ExternalNavItem;
+
+// Base navigation items always shown
+const baseNavigationItems: BaseNavItem[] = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Billing & Plans", href: "/dashboard/billing", icon: CreditCard },
-  // External links to subdomains - add these once the apps are deployed
-  { name: "Laine AI", href: "https://laine.prereq.xyz/dashboard", icon: Mic, external: true },
-  // { name: "Saige Chat", href: "https://saige.prereq.xyz/dashboard", icon: MessageSquareText, external: true },
 ];
+
+// Items that require subscription
+const subscriptionItems: ExternalNavItem[] = [
+  { 
+    name: "Laine AI", 
+    href: "https://laine.prereq.xyz/dashboard", 
+    icon: Mic, 
+    external: true,
+    requiredPlans: ['laine_lite', 'laine_pro']
+  },
+  // Add more subscription-based items as needed
+];
+
+// Function to fetch organization data from our database
+async function fetchOrgData(orgId: string) {
+  try {
+    const response = await fetch(`/api/organizations/${orgId}`);
+    if (!response.ok) return null;
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching organization data:", error);
+    return null;
+  }
+}
+
+// Helper function to check if an item is external
+function isExternalItem(item: NavItem): item is ExternalNavItem {
+  return 'external' in item && item.external === true;
+}
 
 export function Sidebar({ className }: { className?: string }) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { organization } = useOrganization();
+  const [navigationItems, setNavigationItems] = useState<NavItem[]>(baseNavigationItems);
+  
+  // Fetch subscription data when the component mounts or org changes
+  useEffect(() => {
+    if (organization?.id) {
+      fetchOrgData(organization.id).then(data => {
+        if (data?.activePlanId) {
+          const planId = data.activePlanId;
+          const availableItems = [...baseNavigationItems];
+          
+          // Add subscription items based on the active plan
+          for (const item of subscriptionItems) {
+            if (item.requiredPlans.includes(planId)) {
+              availableItems.push(item);
+            }
+          }
+          
+          setNavigationItems(availableItems);
+        }
+      });
+    }
+  }, [organization?.id]);
   
   return (
     <>
@@ -55,7 +122,7 @@ export function Sidebar({ className }: { className?: string }) {
               <span className="sr-only">Close</span>
             </Button>
           </div>
-          <div className="flex-1 overflow-auto py-2 px-4">
+          <div className="flex-1 overflow-auto py-2 px-4 flex flex-col">
             <nav className="flex flex-col space-y-1">
               {navigationItems.map((item) => (
                 <Link
@@ -66,17 +133,22 @@ export function Sidebar({ className }: { className?: string }) {
                     pathname === item.href ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-primary/5"
                   )}
                   onClick={() => {
-                    if (!item.external) setIsMobileMenuOpen(false);
+                    if (!isExternalItem(item)) setIsMobileMenuOpen(false);
                   }}
-                  target={item.external ? "_blank" : undefined}
-                  rel={item.external ? "noopener noreferrer" : undefined}
+                  target={isExternalItem(item) ? "_blank" : undefined}
+                  rel={isExternalItem(item) ? "noopener noreferrer" : undefined}
                 >
                   {item.icon && <item.icon className="mr-2 h-4 w-4" />}
                   <span>{item.name}</span>
-                  {item.external && <ChevronRight className="ml-auto h-4 w-4" />}
+                  {isExternalItem(item) && <ChevronRight className="ml-auto h-4 w-4" />}
                 </Link>
               ))}
             </nav>
+            
+            {/* Account navigation in mobile view */}
+            <div className="mt-auto pt-4">
+              <UserAccountNav />
+            </div>
           </div>
         </div>
       )}
@@ -96,15 +168,18 @@ export function Sidebar({ className }: { className?: string }) {
                   "group flex items-center rounded-md px-3 py-2 text-sm font-medium",
                   pathname === item.href ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-primary/5"
                 )}
-                target={item.external ? "_blank" : undefined}
-                rel={item.external ? "noopener noreferrer" : undefined}
+                target={isExternalItem(item) ? "_blank" : undefined}
+                rel={isExternalItem(item) ? "noopener noreferrer" : undefined}
               >
                 {item.icon && <item.icon className="mr-2 h-4 w-4" />}
                 <span>{item.name}</span>
-                {item.external && <ChevronRight className="ml-auto h-4 w-4" />}
+                {isExternalItem(item) && <ChevronRight className="ml-auto h-4 w-4" />}
               </Link>
             ))}
           </nav>
+          
+          {/* User Account Navigation */}
+          <UserAccountNav />
         </div>
       </div>
     </>

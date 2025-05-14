@@ -1,5 +1,6 @@
 import { clerkMiddleware } from '@clerk/nextjs/server';
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 export default clerkMiddleware(async (auth, req: NextRequest) => {
   const { userId, has } = await auth();

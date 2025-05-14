@@ -6,7 +6,10 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,md,json}\"",
-    "typecheck": "turbo typecheck"
+    "typecheck": "turbo typecheck",
+    "postinstall": "pnpm --filter @repo/db db:generate",
+    "vercel-build": "if [ \"$VERCEL_ENV\" != \"production\" ]; then pnpm --filter @repo/db db:deploy; fi && turbo build",
+    "prod-migrate": "pnpm --filter @repo/db db:deploy"
   },
   "devDependencies": {
     "eslint": "^9.26.0",

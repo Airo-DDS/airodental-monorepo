@@ -1,7 +1,20 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "globalDependencies": ["**/.env.*local", "pnpm-lock.yaml"],
-  "globalEnv": ["NODE_ENV", "DATABASE_URL"],
+  "globalEnv": [
+    "NODE_ENV", 
+    "DATABASE_URL",
+    "NEXT_PUBLIC_CLERK_IS_SATELLITE",
+    "CLERK_DOMAIN",
+    "NEXT_PUBLIC_CLERK_DOMAIN",
+    "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
+    "CLERK_SECRET_KEY",
+    "NEXT_PUBLIC_CLERK_SIGN_IN_URL",
+    "NEXT_PUBLIC_CLERK_SIGN_UP_URL",
+    "NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL",
+    "NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL",
+    "VERCEL_ENV"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build", "db:generate"],
@@ -22,6 +35,9 @@
       "cache": false
     },
     "db:studio": {
+      "cache": false
+    },
+    "db:deploy": {
       "cache": false
     }
   }
