@@ -11,7 +11,9 @@ import {
   CreditCard,
   Mic,
   ChevronRight,
-  X
+  X,
+  Building,
+  Star
 } from 'lucide-react';
 import { useOrganization } from '@clerk/nextjs';
 import type { LucideIcon } from 'lucide-react';
@@ -35,6 +37,8 @@ type NavItem = BaseNavItem | ExternalNavItem;
 const baseNavigationItems: BaseNavItem[] = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Billing & Plans", href: "/dashboard/billing", icon: CreditCard },
+  { name: "Organization", href: "/dashboard/organization", icon: Building },
+  { name: "Premium Features", href: "/dashboard/premium-features", icon: Star },
 ];
 
 // Items that require subscription

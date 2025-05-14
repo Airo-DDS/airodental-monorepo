@@ -1,45 +1,55 @@
-import { prisma } from '@repo/db';
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { NextResponse } from "next/server";
+import { prisma } from "@repo/db";
+import { auth } from "@clerk/nextjs/server";
 
 export async function GET(
-  request: NextRequest,
+  request: Request,
   { params }: { params: { id: string } }
 ) {
-  // Get the organization ID from the URL parameter
-  const orgId = params.id;
-  
-  // Verify that the user has access to this organization
-  const { userId, orgId: userOrgId } = await auth();
-  
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  
-  if (userOrgId !== orgId) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
-  
   try {
-    // Find the organization in our database
+    const { userId, orgId, has } = await auth();
+    
+    // If not authenticated, return 401
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    
+    // Check if the requested org ID matches the current context
+    if (orgId && params.id !== orgId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    
+    // Get the organization from our database
     const organization = await prisma.organization.findUnique({
-      where: { id: orgId },
+      where: { id: params.id },
       select: {
         id: true,
         name: true,
         slug: true,
         activePlanId: true,
-      },
+      }
     });
     
     if (!organization) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
+      return NextResponse.json({ error: "Organization not found" }, { status: 404 });
     }
     
-    return NextResponse.json(organization);
+    // Add subscription data from Clerk
+    const subscriptionData = {
+      hasLaineLite: has({ plan: 'laine_lite' }),
+      hasLainePro: has({ plan: 'laine_pro' }),
+      hasDataExport: has({ feature: 'data_export' }),
+    };
+    
+    return NextResponse.json({
+      ...organization,
+      subscriptionData
+    });
   } catch (error) {
-    console.error('Error fetching organization:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error fetching organization:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch organization" },
+      { status: 500 }
+    );
   }
 } 

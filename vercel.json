@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pnpm vercel-build",
+  "buildCommand": "turbo run build",
   "installCommand": "pnpm install",
   "framework": "nextjs",
   "outputDirectory": ".next",

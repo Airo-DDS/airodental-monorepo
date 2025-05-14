@@ -1,31 +1,57 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
-
-const isDashboardRoute = createRouteMatcher(['/dashboard(.*)']);
+import { clerkMiddleware } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 export default clerkMiddleware(async (auth, req: NextRequest) => {
-  const { userId, orgId, has } = await auth();
-  const url = req.nextUrl;
-
-  if (isDashboardRoute(req)) { // Protecting /dashboard and its sub-paths
-    if (!userId) {
-      return NextResponse.redirect(new URL(`https://prereq.xyz/sign-in?redirect_url=${encodeURIComponent(url.href)}`, req.url));
-    }
-    if (!orgId) {
-      return NextResponse.redirect(new URL(`https://prereq.xyz/onboarding?redirect_url=${encodeURIComponent(url.href)}`, req.url));
-    }
-    const hasLaineAccess = has({ feature: 'laine_access_lite' }) || has({ feature: 'laine_access_pro' }) || has({ plan: 'laine_lite' }) || has({ plan: 'laine_pro' });
-    if (!hasLaineAccess) {
-      return NextResponse.redirect(new URL('https://prereq.xyz/dashboard/billing', req.url));
-    }
+  // Routes that can be accessed while signed in or signed out
+  const publicRoutes = ["/"];
+  const isPublicRoute = publicRoutes.some(route => 
+    req.nextUrl.pathname === route || req.nextUrl.pathname.startsWith(route)
+  );
+  
+  // Check if route is public
+  if (isPublicRoute) {
+    return NextResponse.next();
   }
-  // Other routes in Laine app (like '/') are public or handled by page-level checks if needed.
+  
+  // Handle authenticated requests
+  const { userId, orgId, has } = await auth();
+  
+  if (userId) {
+    // If user doesn't have an organization selected but has organizations,
+    // redirect to organization selection
+    if (!orgId) {
+      const orgSelection = new URL('/dashboard', req.url);
+      return NextResponse.redirect(orgSelection);
+    }
+    
+    // If user is in an organization context
+    if (orgId) {
+      // For dashboard paths, check if they have access to the required plan or feature
+      if (req.nextUrl.pathname.startsWith('/dashboard')) {
+        // Check if the organization has access to Laine plans
+        const hasAccess = has({ plan: 'laine_lite' }) || 
+                         has({ plan: 'laine_pro' }) ||
+                         has({ feature: 'laine_access' });
+        
+        if (!hasAccess) {
+          // Redirect to the web app billing page if they don't have access
+          const billingUrl = new URL('https://app.airodental.com/dashboard/billing');
+          return NextResponse.redirect(billingUrl);
+        }
+      }
+    }
+  } 
+  // For non-public routes where the user isn't authenticated, redirect to sign-in
+  else {
+    const signInUrl = new URL('/sign-in', req.url);
+    signInUrl.searchParams.set('redirect_url', req.url);
+    return NextResponse.redirect(signInUrl);
+  }
+  
+  return NextResponse.next();
 });
 
 export const config = {
-  matcher: [
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    '/(api|trpc)(.*)',
-  ],
+  matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
 }; 
