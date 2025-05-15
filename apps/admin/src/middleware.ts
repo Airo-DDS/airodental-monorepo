@@ -14,6 +14,11 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
   }
   
   // Allow access if admin
+}, {
+  signInUrl: 'https://prereq.xyz/sign-in',
+  signUpUrl: 'https://prereq.xyz/sign-up',
+  isSatellite: true,
+  domain: 'prereq.xyz'
 });
 
 export const config = {

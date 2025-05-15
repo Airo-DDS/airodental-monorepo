@@ -50,6 +50,11 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
   }
   
   return NextResponse.next();
+}, {
+  signInUrl: 'https://prereq.xyz/sign-in',
+  signUpUrl: 'https://prereq.xyz/sign-up',
+  isSatellite: true,
+  domain: 'prereq.xyz'
 });
 
 export const config = {

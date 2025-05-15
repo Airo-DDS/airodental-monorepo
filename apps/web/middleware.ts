@@ -15,13 +15,17 @@ const isPublicRoute = createRouteMatcher([
   // Add other public routes like /pricing, /about, etc.
 ]);
 
-export default clerkMiddleware((auth, req) => {
+export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) {
-    auth.protect(); // Corrected: auth.protect() instead of auth().protect()
+    await auth.protect();
   }
 
   // If the route is not public and not protected, it's implicitly public.
   // You can add more specific logic if needed.
+}, {
+  // Primary app configuration - doesn't need satellite settings
+  signInUrl: '/sign-in',
+  signUpUrl: '/sign-up'
 });
 
 export const config = {
