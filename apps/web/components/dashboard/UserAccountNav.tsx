@@ -28,6 +28,9 @@ export function UserAccountNav() {
         </div>
         <OrganizationSwitcher 
           hidePersonal={false}
+          afterSelectOrganizationUrl="/dashboard"
+          afterLeaveOrganizationUrl="/dashboard"
+          organizationProfileUrl="/dashboard/organization"
           appearance={{
             elements: {
               rootBox: "flex",

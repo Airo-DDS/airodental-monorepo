@@ -37,9 +37,11 @@ export default async function OnboardingPage() {
         <h2>Switch or Manage Organizations</h2>
         <p>If you&apos;ve been invited to an organization or want to switch, use the switcher below.</p>
         <OrganizationSwitcher
+          hidePersonal={false}
           afterCreateOrganizationUrl="/dashboard"
           afterSelectOrganizationUrl="/dashboard"
-          afterLeaveOrganizationUrl="/onboarding" // Or a different page
+          afterLeaveOrganizationUrl="/onboarding"
+          organizationProfileUrl="/dashboard/organization"
         />
       </div>
     </div>

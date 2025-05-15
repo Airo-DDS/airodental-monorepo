@@ -23,9 +23,23 @@ export default clerkMiddleware(async (auth, req) => {
   // If the route is not public and not protected, it's implicitly public.
   // You can add more specific logic if needed.
 }, {
-  // Primary app configuration - doesn't need satellite settings
+  // Primary app configuration
   signInUrl: '/sign-in',
-  signUpUrl: '/sign-up'
+  signUpUrl: '/sign-up',
+  
+  // Add organization synchronization options for proper organization switching
+  organizationSyncOptions: {
+    // Define organization-specific URL patterns to ensure organization switching works
+    organizationPatterns: [
+      '/dashboard/:slug',
+      '/dashboard/:slug/(.*)',
+      '/dashboard/organization/(.*)'
+    ],
+    // Define personal account URL patterns
+    personalAccountPatterns: [
+      '/dashboard/user/(.*)'
+    ]
+  }
 });
 
 export const config = {

@@ -96,7 +96,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        variables: {
+          colorPrimary: '#0f172a', // Match with your primary color
+        }
+      }}
+      allowedRedirectOrigins={[
+        'https://admin.prereq.xyz',
+        'https://laine.prereq.xyz', 
+        'https://docs.prereq.xyz',
+        'http://localhost:3001',
+        'http://localhost:3002',
+        'http://localhost:3003'
+      ]}
+    >
       <html lang="en" suppressHydrationWarning>
         <RootLayoutContent>
           {children}
