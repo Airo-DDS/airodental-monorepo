@@ -1,49 +1,71 @@
+'use client'; // This page needs to be a client component for form handling
+
+import * as React from 'react';
+import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation'; // Use 'next/navigation' for App Router
+import { completeUserOnboarding } from './_actions'; // Server action
+import { Button } from '@repo/ui'; // Assuming Button component from your UI package
 import { CreateOrganization, OrganizationSwitcher } from '@clerk/nextjs';
-import { auth, currentUser } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
 
-export default async function OnboardingPage() {
-  const { userId, orgId } = await auth();
-  const user = await currentUser();
+export default function OnboardingPage() {
+  const [error, setError] = React.useState('');
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const { user } = useUser();
+  const router = useRouter();
 
-  if (!userId) {
-    redirect('/sign-in'); // Should be caught by middleware, but good practice
-  }
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+    setError('');
 
-  if (orgId) {
-    // If user already has an active organization, redirect to dashboard
-    redirect('/dashboard');
-  }
+    // Create FormData if your action expects it, or pass data directly
+    // For a simple confirmation, FormData might be overkill.
+    // const formData = new FormData(event.currentTarget); 
 
-  // For now, we'll just show CreateOrganization.
-  // Later, we can add logic to show OrganizationList if they have invitations.
+    try {
+      const result = await completeUserOnboarding(); // Pass formData if needed
+      if (result?.success) {
+        await user?.reload(); // Reload user data to get updated session claims
+        router.push(process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL || '/dashboard'); // Redirect to dashboard
+      } else {
+        setError(result?.error || 'An unknown error occurred.');
+      }
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      setError(errorMessage || 'Failed to complete onboarding.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <div>
-      <h1>Onboarding</h1>
-      <p>Welcome, {user?.firstName || user?.emailAddresses[0]?.emailAddress}!</p>
-      <p>To continue, please create or select an organization.</p>
-
+    <div style={{ padding: '2rem', maxWidth: '600px', margin: 'auto' }}>
+      <h1>Welcome to AiroDental!</h1>
+      <p>Please confirm a few details to complete your setup.</p>
+      
       <div style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-        <h2>Create a New Practice (Organization)</h2>
+        <h2>Create or Select Your Practice</h2>
         <CreateOrganization afterCreateOrganizationUrl="/dashboard" />
-      </div>
-
-      {/*
-        We might add <OrganizationList /> here later if the user
-        has pending invitations or belongs to orgs but none are active.
-        For now, focus on creation.
-      */}
-      <div style={{ marginTop: '2rem' }}>
-        <h2>Switch or Manage Organizations</h2>
-        <p>If you&apos;ve been invited to an organization or want to switch, use the switcher below.</p>
         <OrganizationSwitcher
           hidePersonal={false}
           afterCreateOrganizationUrl="/dashboard"
           afterSelectOrganizationUrl="/dashboard"
-          afterLeaveOrganizationUrl="/onboarding"
-          organizationProfileUrl="/dashboard/organization"
         />
       </div>
+
+      <form onSubmit={handleSubmit} style={{ marginTop: '2rem' }}>
+        {/* Add any simple fields here if desired, e.g.:
+        <div>
+          <label htmlFor="displayName">Your Name/Role:</label>
+          <input type="text" name="displayName" id="displayName" required />
+        </div> 
+        */}
+        <p style={{marginBlock: "1rem"}}>Click below to finalize your account setup.</p>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Processing...' : 'Complete Setup & Go to Dashboard'}
+        </Button>
+        {error && <p style={{ color: 'red', marginTop: '1rem' }}>Error: {error}</p>}
+      </form>
     </div>
   );
 }

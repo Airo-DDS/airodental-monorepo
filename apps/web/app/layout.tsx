@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { Lato } from 'next/font/google';
 import './globals.css';
@@ -26,6 +26,13 @@ const lato = Lato({
   display: 'swap',
 });
 
+// Move viewport to a separate export
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export const metadata: Metadata = {
   title: "Airodental | AI-Powered Dental Practice Management",
   description: "Revolutionize your dental practice with Airodental's AI solutions. Streamline patient communication, enhance staff training, and improve practice efficiency with our comprehensive AI ecosystem.",
@@ -33,6 +40,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Airodental Team" }],
   creator: "Airodental",
   publisher: "Airodental",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://airodental.com'),
   openGraph: {
     title: "Airodental | AI-Powered Dental Practice Management",
     description: "Revolutionize your dental practice with Airodental's AI solutions. Streamline patient communication, enhance staff training, and improve practice efficiency.",
@@ -65,11 +73,6 @@ export const metadata: Metadata = {
       'max-image-preview': 'large',
       'max-snippet': -1,
     },
-  },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
   },
   category: "Technology",
   verification: {

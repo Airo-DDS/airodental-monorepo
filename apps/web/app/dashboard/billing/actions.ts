@@ -1,10 +1,17 @@
 'use server';
 
-import { auth } from '@clerk/nextjs/server';
-import { prisma } from '@repo/db';
-import { revalidatePath } from 'next/cache';
-
-export async function subscribeToLainePlan(formData: FormData) {
+// This function is DEPRECATED and should not be used.
+// Subscription is now handled by Clerk's <PricingTable /> and webhooks.
+// Keeping this function for historical reference only.
+export async function subscribeToLainePlan() {
+  throw new Error("This action is deprecated. Subscriptions are managed via Clerk Billing components and webhooks.");
+  
+  // The following code is kept for historical reference only.
+  /*
+  import { auth } from '@clerk/nextjs/server';
+  import { prisma } from '@repo/db';
+  import { revalidatePath } from 'next/cache';
+  
   const { orgId } = await auth();
   
   if (!orgId) {
@@ -59,4 +66,5 @@ export async function subscribeToLainePlan(formData: FormData) {
     console.error('Error updating organization plan:', error);
     return { success: false, message: 'Failed to update subscription' };
   }
+  */
 } 

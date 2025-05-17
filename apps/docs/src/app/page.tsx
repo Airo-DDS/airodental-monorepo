@@ -17,8 +17,20 @@ export default function DocsPortalPage() {
           </Button>
         </div>
         <div className="border p-6 rounded-lg bg-card">
-          <h2 className="text-xl font-semibold mb-4">Coming Soon</h2>
-          <p className="mb-4">Additional documentation is being developed.</p>
+          <h2 className="text-xl font-semibold mb-4">Authentication System</h2>
+          <p className="mb-4">Learn about our multi-domain authentication system and how it works across the ecosystem.</p>
+          <Button asChild>
+            <Link href="/auth">View Documentation</Link>
+          </Button>
+        </div>
+        <div className="border p-6 rounded-lg bg-card">
+          <h2 className="text-xl font-semibold mb-4">API Documentation</h2>
+          <p className="mb-4">API reference and usage guides for developers.</p>
+          <Button disabled>Coming Soon</Button>
+        </div>
+        <div className="border p-6 rounded-lg bg-card">
+          <h2 className="text-xl font-semibold mb-4">Deployment Guides</h2>
+          <p className="mb-4">Instructions for deploying applications to various environments.</p>
           <Button disabled>Coming Soon</Button>
         </div>
       </div>

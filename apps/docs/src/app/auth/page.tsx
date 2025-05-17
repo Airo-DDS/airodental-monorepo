@@ -4,14 +4,14 @@ import type { Metadata } from 'next';
 import ReactMarkdown from 'react-markdown';
 
 export const metadata: Metadata = {
-  title: 'Database Management Guide | AiroDental Docs',
-  description: 'Documentation for database operations in the AiroDental monorepo',
+  title: 'Authentication System | AiroDental Docs',
+  description: 'Documentation for the authentication system across the AiroDental ecosystem',
 };
 
-export default async function DbDocPage() {
+export default async function AuthDocPage() {
   // Read the markdown file
   const markdownContent = await fs.readFile(
-    path.join(process.cwd(), 'src/app/db/db.md'),
+    path.join(process.cwd(), 'src/app/auth/auth.md'),
     'utf-8'
   );
 

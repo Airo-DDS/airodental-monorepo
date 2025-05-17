@@ -33,6 +33,12 @@ type ExternalNavItem = BaseNavItem & {
 
 type NavItem = BaseNavItem | ExternalNavItem;
 
+// Define Laine plan IDs that grant access
+const LAINE_PLAN_IDS = [
+  'cplan_2x5a84PFmhsS4gkfXDqmisAApEn', // Laine Lite
+  'cplan_2x5aIIa7rgqhWD6iNsgwz3CyrgU', // Laine Pro
+];
+
 // Base navigation items always shown
 const baseNavigationItems: BaseNavItem[] = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -45,10 +51,10 @@ const baseNavigationItems: BaseNavItem[] = [
 const subscriptionItems: ExternalNavItem[] = [
   { 
     name: "Laine AI", 
-    href: "https://laine.prereq.xyz/dashboard", 
+    href: `${process.env.NEXT_PUBLIC_LAINE_APP_URL || 'https://laine.prereq.xyz'}/dashboard`,
     icon: Mic, 
     external: true,
-    requiredPlans: ['laine_lite', 'laine_pro']
+    requiredPlans: LAINE_PLAN_IDS
   },
   // Add more subscription-based items as needed
 ];
@@ -79,21 +85,19 @@ export function Sidebar({ className }: { className?: string }) {
   // Fetch subscription data when the component mounts or org changes
   useEffect(() => {
     if (organization?.id) {
-      fetchOrgData(organization.id).then(data => {
-        if (data?.activePlanId) {
-          const planId = data.activePlanId;
-          const availableItems = [...baseNavigationItems];
-          
-          // Add subscription items based on the active plan
-          for (const item of subscriptionItems) {
-            if (item.requiredPlans.includes(planId)) {
-              availableItems.push(item);
-            }
+      fetchOrgData(organization.id).then(orgDbData => {
+        const currentNavItems = [...baseNavigationItems];
+        if (orgDbData?.activePlanId && LAINE_PLAN_IDS.includes(orgDbData.activePlanId)) {
+          // Add Laine AI link if a Laine plan is active
+          const laineNavItem = subscriptionItems.find(item => item.name === "Laine AI");
+          if (laineNavItem) {
+            currentNavItems.push(laineNavItem);
           }
-          
-          setNavigationItems(availableItems);
         }
+        setNavigationItems(currentNavItems);
       });
+    } else {
+      setNavigationItems(baseNavigationItems); // Reset if no org
     }
   }, [organization?.id]);
   

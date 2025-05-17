@@ -1,26 +1,24 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@repo/db";
+import type { NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { prisma } from "@repo/db";
 
 export async function GET(
-  request: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params;
-  const { userId, orgId, has } = await auth();
+): Promise<NextResponse> {
+  const { userId, orgId } = await auth();
   
-  // If not authenticated, return 401
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   
-  // Check if the requested org ID matches the current context
-  if (orgId && id !== orgId) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const { id } = await params;
+  if (orgId !== id) {
+    return NextResponse.json({ error: "Forbidden: You can only access your active organization's data." }, { status: 403 });
   }
   
   try {
-    // Get the organization from our database
     const organization = await prisma.organization.findUnique({
       where: { id },
       select: {
@@ -32,24 +30,15 @@ export async function GET(
     });
     
     if (!organization) {
-      return NextResponse.json({ error: "Organization not found" }, { status: 404 });
+      return NextResponse.json({ error: "Organization not found in our records" }, { status: 404 });
     }
     
-    // Add subscription data from Clerk
-    const subscriptionData = {
-      hasLaineLite: has({ plan: 'laine_lite' }),
-      hasLainePro: has({ plan: 'laine_pro' }),
-      hasDataExport: has({ feature: 'data_export' }),
-    };
-    
-    return NextResponse.json({
-      ...organization,
-      subscriptionData
-    });
+    return NextResponse.json(organization);
+
   } catch (error) {
-    console.error("Error fetching organization:", error);
+    console.error("Error fetching organization for sidebar:", error);
     return NextResponse.json(
-      { error: "Failed to fetch organization" },
+      { error: "Failed to fetch organization data" },
       { status: 500 }
     );
   }

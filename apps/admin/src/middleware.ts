@@ -6,19 +6,27 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
   const { userId, has } = await auth();
   
   if (!userId) {
-    return NextResponse.redirect(new URL(`https://prereq.xyz/sign-in?redirect_url=${encodeURIComponent(req.nextUrl.href)}`, req.url));
+    const webAppSignIn = new URL(process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || `${process.env.NEXT_PUBLIC_WEB_APP_URL}/sign-in`, req.url);
+    webAppSignIn.searchParams.set('redirect_url', req.nextUrl.href);
+    return NextResponse.redirect(webAppSignIn);
   }
   
   if (!has({permission: "system:admin:access"})) {
-    return NextResponse.redirect(new URL('https://prereq.xyz/unauthorized', req.url));
+    const unauthorizedUrl = new URL(
+      process.env.NEXT_PUBLIC_WEB_APP_URL 
+        ? `${process.env.NEXT_PUBLIC_WEB_APP_URL}/unauthorized` 
+        : 'http://localhost:3000/unauthorized', 
+      req.url
+    );
+    return NextResponse.redirect(unauthorizedUrl);
   }
   
   // Allow access if admin
 }, {
-  signInUrl: 'https://prereq.xyz/sign-in',
-  signUpUrl: 'https://prereq.xyz/sign-up',
+  signInUrl: process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || `${process.env.NEXT_PUBLIC_WEB_APP_URL}/sign-in`,
+  signUpUrl: process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || `${process.env.NEXT_PUBLIC_WEB_APP_URL}/sign-up`,
   isSatellite: true,
-  domain: 'prereq.xyz'
+  domain: process.env.NEXT_PUBLIC_CLERK_DOMAIN || 'localhost:3000'
 });
 
 export const config = {
